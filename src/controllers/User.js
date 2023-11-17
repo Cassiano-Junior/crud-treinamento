@@ -2,7 +2,7 @@ const UserModel = require('../models/Users')
 
 async function readUsers(req, res) {
   try {
-    const users = await UserModel.find({})
+    const users = await UserModel.find({}, '-password')
     res.send(users)
   } catch (error) {
     res.send(error.message)
@@ -12,7 +12,7 @@ async function readUsers(req, res) {
 async function readUserById(req, res) {
   try { 
     const id = req.params.id
-    const user = await UserModel.findById(id)
+    const user = await UserModel.findById(id, '-password')
     res.send(user)
 
   } catch (error) {
