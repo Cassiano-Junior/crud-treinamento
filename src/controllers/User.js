@@ -1,5 +1,7 @@
 const UserModel = require('../models/Users')
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
+require('dotenv').config()
 
 async function readUsers(req, res) {
   try {
@@ -81,10 +83,51 @@ async function deleteUser(req, res) {
   }
 }
 
+async function login(req, res) {
+  const { email, password } = req.body
+
+  // Validations
+  if(!email) {
+    return res.status(422).json({msg:"O campo e-mail é obrigatório!"})
+  }
+
+  if(!password) {
+    return res.status(422).json({msg: "O campo 'senha' é obrigatório!"})
+  }
+
+  // Check if user exists
+  const user = await UserModel.findOne({email: email})
+  if(!user) {
+    return res.status(404).json({msg: "Usuário não encontrado!"})
+  }
+
+  //Check if password match
+  const checkPassword = await bcrypt.compare(password, user.password)
+  if(!checkPassword) {
+    return res.status(422).json({msg: "Senha inválida!"})
+  }
+
+  //Autentication and generation token
+  try {
+    const secret = process.env.SECRET
+    const token = jwt.sign({
+      id: user._id
+    }, secret)
+
+    res.status(200).json({msg: "Autenticação realizada com sucesso!", token})
+  } 
+  
+  catch(error) {
+    res.send(error.message)
+  }
+
+}
+
 module.exports = {
   readUsers,
   readUserById,
   createUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  login
 }
