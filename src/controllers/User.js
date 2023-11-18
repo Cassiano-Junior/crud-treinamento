@@ -21,6 +21,26 @@ async function readUserById(req, res) {
 }
 
 async function createUser(req, res) {
+  const {name, email, password, city} = req.body
+
+  if(!name) {
+    return res.json({msg: "O campo nome é obrigatório!"})
+  }
+
+  if(!email) {
+    return res.json({msg: "O campo email é obrigatório!"})
+  }
+
+  if(!password) {
+    return res.json({msg: "O campo senha é obrigatório"})
+  }
+
+  if(!city) {
+    return res.json({msg: "O campo cidade é obrigatório!"})
+  }
+
+  
+
   try {
     const user = await UserModel.create(req.body)
     res.send(user)
