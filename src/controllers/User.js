@@ -66,8 +66,8 @@ async function createUser(req, res) {
 async function updateUser(req, res) {
   try{
     const id = req.params.id
-    const user = await UserModel.findByIdAndUpdate(id, req.body, {new: true})
-    res.send(user)
+    await UserModel.findByIdAndUpdate(id, req.body, {new: true})
+    res.status(200).json({msg: "Usuário atualizado com sucesso!"})
   } catch (error) {
     res.send(error.message)
   }
@@ -122,11 +122,25 @@ async function login(req, res) {
   }
 }
 
+function checkToken(req, res, next) {
+  const authHeader = req.headers['authorization']
+  const token = authHeader && authHeader.split('')[1]
+  try {
+    const secret = process.env.SECRET
+    jwt.verify(token, secret)
+    next()
+
+  } catch(error) {
+    res.status(400).json({msg:"Token inválido!"})
+  }
+}
+
 module.exports = {
   readUsers,
   readUserById,
   createUser,
   updateUser,
   deleteUser,
-  login
+  login,
+  checkToken
 }
