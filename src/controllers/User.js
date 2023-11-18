@@ -23,23 +23,28 @@ async function readUserById(req, res) {
 async function createUser(req, res) {
   const {name, email, password, city} = req.body
 
+  //Validations
   if(!name) {
-    return res.json({msg: "O campo nome é obrigatório!"})
+    return res.status(422).json({msg: "O campo nome é obrigatório!"})
   }
 
   if(!email) {
-    return res.json({msg: "O campo email é obrigatório!"})
+    return res.status(422).json({msg: "O campo email é obrigatório!"})
   }
 
   if(!password) {
-    return res.json({msg: "O campo senha é obrigatório"})
+    return res.status(422).json({msg: "O campo senha é obrigatório"})
   }
 
   if(!city) {
-    return res.json({msg: "O campo cidade é obrigatório!"})
+    return res.status(422).json({msg: "O campo cidade é obrigatório!"})
   }
 
-  
+  // Check if user exists
+  const userExists = await UserModel.findOne({email: email})
+  if(userExists) {
+    return res.status(422).json({msg:"Endereço de e-mail já cadastrado!"})
+  }
 
   try {
     const user = await UserModel.create(req.body)
@@ -63,8 +68,8 @@ async function updateUser(req, res) {
 async function deleteUser(req, res) {
   try {
     const id = req.params.id
-    const user = await UserModel.findByIdAndDelete(id)
-    res.send(user)
+    await UserModel.findByIdAndDelete(id)
+    res.json({msg: "Usuário excluído com sucesso!"})
   } catch (error) {
     res.send(error)
   }
