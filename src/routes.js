@@ -4,7 +4,7 @@ const userControllers = require('./controllers/User')
 const routes = Router()
 
 routes.get('/', userControllers.readUsers)
-routes.get('/:id', userControllers.readUserById)
+routes.get('/auth/:id', userControllers.checkToken, userControllers.readUserById)
 routes.post('/', userControllers.createUser)
 routes.post('/auth/login', userControllers.login)
 routes.put('/:id', userControllers.updateUser)
