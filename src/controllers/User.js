@@ -1,4 +1,5 @@
 const UserModel = require('../models/Users')
+const bcrypt = require('bcrypt')
 
 async function readUsers(req, res) {
   try {
@@ -46,9 +47,14 @@ async function createUser(req, res) {
     return res.status(422).json({msg:"Endereço de e-mail já cadastrado!"})
   }
 
+  // Create Password
+  const salt = await bcrypt.genSalt(12)
+  const passwordHash = await bcrypt.hash(password, salt)
+ 
+
   try {
-    const user = await UserModel.create(req.body)
-    res.send(user)
+    await UserModel.create({name, email, city, password:passwordHash})
+    res.status(201).json({msg: "Usuário criado com sucesso!"})
   } catch (error) {
     console.error(error)
     res.send(error.message)
